@@ -85,4 +85,28 @@
     tags:
       - systemd
 
+  - name: Install zip
+    apt:
+      pkg: zip
+      state: present
+    tags:
+      - backup
 
+  - name: Install backup script
+    template:
+      src: backup.sh.j2
+      dest: /srv/minecraft/backup.sh
+      owner: minecraft
+      group: minecraft
+      mode: 0750
+    tags:
+      - backup
+
+  - name: Install backup cronjob
+    cron:
+      name: Minecraft backup
+      special_time: hourly
+      job: /srv/minecraft/backup.sh
+      user: minecraft
+    tags:
+      - backup

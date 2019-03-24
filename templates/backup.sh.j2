@@ -1,0 +1,10 @@
+#! /bin/bash
+
+DATE="$(date --rfc-3339=seconds)"
+
+mkdir -p /srv/minecraft/backups
+
+/srv/minecraft/rcon-cli --password {{ rcon_password }} save-off
+/srv/minecraft/rcon-cli --password {{ rcon_password }} save-all
+zip -q -r "/srv/minecraft/backups/${DATE}.zip" /srv/minecraft/world
+/srv/minecraft/rcon-cli --password {{ rcon_password }} save-on

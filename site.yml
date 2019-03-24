@@ -1,0 +1,88 @@
+---
+- hosts: mc-servers
+
+  roles:
+  - oracle-java
+
+  handlers:
+  - name: Reload minecraft
+    service:
+      name: minecraft
+      state: reloaded
+
+  tasks:
+  - name: Update APT cache
+    apt:
+      update_cache: true
+
+  - name: Create minecraft user and home directory
+    user:
+      name: minecraft
+      state: present
+      home: /srv/minecraft
+
+  - name: Download minecraft server binary
+    get_url:
+      url: https://launcher.mojang.com/v1/objects/3737db93722a9e39eeada7c27e7aca28b144ffa7/server.jar
+      dest: /srv/minecraft/server.1.13.2.jar
+    become: minecraft
+
+  - name: Create symlink for server binary
+    file:
+      state: link
+      src: /srv/minecraft/server.1.13.2.jar
+      dest: /srv/minecraft/server.jar
+      owner: minecraft
+      group: minecraft
+    become: minecraft
+
+  - name: Accept EULA
+    template:
+      src: eula.txt.j2
+      dest: /srv/minecraft/eula.txt
+    become: minecraft
+
+  - name: Install server.properties
+    template:
+      src: server.properties.j2
+      dest: /srv/minecraft/server.properties
+    become: minecraft
+    notify: reload minecraft
+
+  - name: Download rcon-cli
+    get_url:
+      url: "https://github.com/itzg/rcon-cli/releases/download/1.4.4/rcon-cli_1.4.4_linux_amd64.tar.gz"
+      dest: /srv/minecraft/rcon-cli_1.4.4_linux_amd64.tar.gz
+      owner: minecraft
+      group: minecraft
+    become: minecraft
+    tags:
+      - rcon
+
+  - name: Unpack rcon-cli
+    unarchive:
+      src: /srv/minecraft/rcon-cli_1.4.4_linux_amd64.tar.gz
+      remote_src: yes
+      dest: /srv/minecraft/
+    tags:
+      - rcon
+
+  - name: Install systemd unit file
+    template:
+      src: minecraft.service.j2
+      dest: /etc/systemd/system/minecraft.service
+    become: minecraft
+    tags:
+      - systemd
+
+  - name: Enable and start systemd service
+    systemd:
+      name: minecraft
+      state: started
+      enabled: yes
+      daemon_reload: yes
+    become: minecraft
+    tags:
+      - systemd
+
+

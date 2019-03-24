@@ -1,0 +1,3 @@
+- src: https://github.com/ansiblebit/oracle-java
+  version: 3f09f2b80075b89a1756752ff4e392e54f25a2c3
+  name: oracle-java

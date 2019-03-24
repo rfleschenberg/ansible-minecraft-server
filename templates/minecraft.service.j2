@@ -1,0 +1,16 @@
+[Unit]
+Description=Minecraft server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/java -Xmx1024M -Xms1024M -jar /srv/minecraft/server.jar nogui
+ExecStop=/srv/minecraft/rcon-cli --password {{ rcon_password }} save-all
+ExecStop=/srv/minecraft/rcon-cli --password {{ rcon_password }} stop
+SuccessExitStatus=1 143
+WorkingDirectory=/srv/minecraft
+User=minecraft
+Group=minecraft
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

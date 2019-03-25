@@ -5,10 +5,10 @@
   - oracle-java
 
   handlers:
-  - name: Reload minecraft
+  - name: Restart minecraft
     service:
       name: minecraft
-      state: reloaded
+      state: restarted
 
   tasks:
   - name: Update APT cache
@@ -42,12 +42,35 @@
       dest: /srv/minecraft/eula.txt
     become: minecraft
 
-  - name: Install server.properties
-    template:
-      src: server.properties.j2
-      dest: /srv/minecraft/server.properties
-    become: minecraft
-    notify: reload minecraft
+  - name: Set MOTD
+    lineinfile:
+      path: /srv/minecraft/server.properties
+      regexp: "^motd="
+      line: "motd=mc.fleschenberg.net"
+    tags:
+      - server-properties
+    notify:
+      - Restart minecraft
+
+  - name: Set difficulty
+    lineinfile:
+      path: /srv/minecraft/server.properties
+      regexp: "^difficulty="
+      line: "difficulty=3"
+    tags:
+      - server-properties
+    notify:
+      - Restart minecraft
+
+  - name: Set max players
+    lineinfile:
+      path: /srv/minecraft/server.properties
+      regexp: "^max-players="
+      line: "max-players=10"
+    tags:
+      - server-properties
+    notify:
+      - Restart minecraft
 
   - name: Download rcon-cli
     get_url:

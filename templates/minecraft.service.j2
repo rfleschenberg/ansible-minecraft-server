@@ -3,7 +3,7 @@ Description=Minecraft server
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/java -Xmx1024M -Xms1024M -jar /srv/minecraft/server.jar nogui
+ExecStart=/usr/bin/java -Xmx2048M -Xms2048M -jar /srv/minecraft/server.jar nogui
 ExecStop=/srv/minecraft/rcon-cli --password {{ rcon_password }} save-all
 ExecStop=/srv/minecraft/rcon-cli --password {{ rcon_password }} stop
 SuccessExitStatus=1 143

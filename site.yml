@@ -133,3 +133,19 @@
       user: minecraft
     tags:
       - backup
+
+  - name: Install tmpreaper
+    apt:
+      pkg: tmpreaper
+      state: present
+    tags:
+      - backup
+
+  - name: Install tmpreaper cronjob
+    cron:
+      name: Clean up old Minecraft backups
+      special_time: daily
+      job: /usr/sbin/tmpreaper 14d /srv/minecraft/backups
+      user: minecraft
+    tags:
+      - backup
